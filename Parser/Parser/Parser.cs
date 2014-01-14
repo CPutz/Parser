@@ -67,7 +67,6 @@ namespace Parser {
 
 
         public ParseResult Parse(string s) {
-            s = s.Replace(" ", string.Empty);
 
             ParseResult res = new ParseResult();
             res.WasSuccesfull = true;
@@ -85,6 +84,7 @@ namespace Parser {
 
 
         private Stack<object> ShuntingYard(string s) {
+
             string[] tokens = GetTokens(s);
 
             //Shunting-yard
@@ -160,30 +160,34 @@ namespace Parser {
         private string[] GetTokens(string s) {
             List<string> list = new List<string>();
 
+            string[] split = s.Split();
 
-            for (int i = 0; i < s.Length; ++i) {
+            foreach (string part in split) {
 
-                char c = s[i];
-                int start = i;
+                for (int i = 0; i < part.Length; ++i) {
 
-                if (numbers.Contains(c)) {
-                    while (i < s.Length - 1 && numbers.Contains(s[i+1])) {
-                        ++i;
-                    }
-                } else if (c == ')') {
-                    //do nothing
-                } else {
-                    for (int k = s.Length - 1; k >= i; --k) {
-                        //DONT KNOW WHETER IT IS BETTER TO CHECK FOR BINARY AND FUNCTION OPERATIONS SEPERATELY
-                        //NOW IT WILL BREAK IF THERE EXISTS AN OPERATION WITH THAT NAME
-                        if (parseTree.Contains(s.Substring(i, k - i + 1))) {
-                            i = k;
-                            break;
+                    char c = part[i];
+                    int start = i;
+
+                    if (numbers.Contains(c)) {
+                        while (i < part.Length - 1 && numbers.Contains(part[i + 1])) {
+                            ++i;
+                        }
+                    } else if (c == ')') {
+                        //do nothing
+                    } else {
+                        for (int k = part.Length - 1; k >= i; --k) {
+                            //DONT KNOW WHETER IT IS BETTER TO CHECK FOR BINARY AND FUNCTION OPERATIONS SEPERATELY
+                            //NOW IT WILL BREAK IF THERE EXISTS AN OPERATION WITH THAT NAME
+                            if (parseTree.Contains(part.Substring(i, k - i + 1))) {
+                                i = k;
+                                break;
+                            }
                         }
                     }
-                }
 
-                list.Add(s.Substring(start, i - start + 1));
+                    list.Add(part.Substring(start, i - start + 1));
+                }
             }
 
             return list.ToArray();
